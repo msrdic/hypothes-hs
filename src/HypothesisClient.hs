@@ -1,24 +1,27 @@
 {-# LANGUAGE OverloadedStrings #-}
+{-# LANGUAGE DeriveGeneric #-}
 module HypothesisClient ( search
                         , SearchFilter (..)
                         , OrderType (..)
                         , SortType (..) ) where
 
-import Data.Configurator (Worth(Required), load)
 import qualified Data.Configurator as DC
+import GHC.Generics ( Generic )
+import qualified Data.Vector as DV
 
 import Data.Text ( Text, concat, pack )
 import Data.Text.Encoding ( encodeUtf8 )
 import System.FilePath ((</>), (<.>))
+import Data.Aeson (Result(Success, Error), fromJSON, decode, FromJSON)
 
-import Network.Wreq (getWith, defaults, param, header, responseBody)
+import Network.Wreq (asJSON, getWith, defaults, param, header, responseBody)
 import Control.Lens ((^.), (.~), (&))
 import Network.Wreq.Lens (Options)
 import Data.Aeson.Lens (key, _Array)
 
 _getAuthToken :: FilePath -> IO (Maybe Text)
 _getAuthToken path = do
-  config <- load [Required path]
+  config <- DC.load [DC.Required path]
   DC.lookup config "token" :: IO (Maybe Text)
 
 getAuthHeader :: Maybe Text -> IO Text
@@ -78,4 +81,21 @@ search filters = do
   let opts = params & header "Authorization" .~ [encodeUtf8 authHeader]
   r <- getWith opts "https://api.hypothes.is/api/search"
   let rb = r ^. responseBody ^. key "rows" . _Array
-  return rb
+  let items = map fromResult $ DV.toList $ DV.map fromJSON rb
+  return (items :: [SearchItem])
+
+fromResult :: Result a -> a
+fromResult (Success r) = r
+fromResult (Error e) = error e
+
+data SearchItem = SearchItem { id :: Text
+                             , created :: Text
+                             , updated :: Text
+                             , user :: Text
+                             , uri :: Text
+                             , text :: Text
+                             , tags :: [Text]
+                             , group :: Text
+                             } deriving (Show, Generic)
+
+instance FromJSON SearchItem where
