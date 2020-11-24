@@ -1,6 +1,5 @@
 {-# LANGUAGE OverloadedStrings #-}
-module HypothesisClient ( main
-                        , search
+module HypothesisClient ( search
                         , SearchFilter (..)
                         , OrderType (..)
                         , SortType (..) ) where
@@ -12,9 +11,10 @@ import Data.Text ( Text, concat, pack )
 import Data.Text.Encoding ( encodeUtf8 )
 import System.FilePath ((</>), (<.>))
 
-import Network.Wreq (getWith, defaults, param, header)
-import Control.Lens ((.~), (&))
+import Network.Wreq (getWith, defaults, param, header, responseBody)
+import Control.Lens ((^.), (.~), (&))
 import Network.Wreq.Lens (Options)
+import Data.Aeson.Lens (key, _Array)
 
 _getAuthToken :: FilePath -> IO (Maybe Text)
 _getAuthToken path = do
@@ -76,8 +76,6 @@ search filters = do
   authHeader <- getAuthHeader token
   let params = getParams filters
   let opts = params & header "Authorization" .~ [encodeUtf8 authHeader]
-  getWith opts "https://api.hypothes.is/api/search"
-
-
-main :: IO ()
-main = search [] >>= print
+  r <- getWith opts "https://api.hypothes.is/api/search"
+  let rb = r ^. responseBody ^. key "rows" . _Array
+  return rb
