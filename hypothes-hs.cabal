@@ -23,6 +23,7 @@ library
                      , wreq
                      , http-client
                      , lens
+                     , bytestring
   default-language:    Haskell2010
   ghc-options:
             -Wall
