@@ -12,9 +12,9 @@ import qualified Data.Vector as DV
 import Data.Text ( Text, concat, pack )
 import Data.Text.Encoding ( encodeUtf8 )
 import System.FilePath ((</>), (<.>))
-import Data.Aeson (Result(Success, Error), fromJSON, decode, FromJSON)
+import Data.Aeson (Result(Success, Error), fromJSON, FromJSON)
 
-import Network.Wreq (asJSON, getWith, defaults, param, header, responseBody)
+import Network.Wreq (getWith, defaults, param, header, responseBody)
 import Control.Lens ((^.), (.~), (&))
 import Network.Wreq.Lens (Options)
 import Data.Aeson.Lens (key, _Array)
@@ -37,6 +37,7 @@ data SearchFilter = User Text
                   | SearchAfter Text
                   | Sort SortType
                   | Limit Int
+                  | Any Text
 
 data OrderType = Asc | Desc
 data SortType = SortByCreated
@@ -62,6 +63,7 @@ toParam (Order o) = param "order" .~ [toOrder o]
 toParam (SearchAfter a) = param "search_after" .~ [a]
 toParam (Sort s) = param "sort" .~ [toSort s]
 toParam (Limit i) = param "limit" .~ [pack $ show i]
+toParam (Any t) = param "any" .~ [t]
 
 toSort :: SortType -> Text
 toSort SortByCreated = "created"
