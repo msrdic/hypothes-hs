@@ -13,7 +13,7 @@ import qualified Data.Vector as DV
 import Data.Text ( Text, concat, pack, unpack )
 import Data.Text.Encoding ( encodeUtf8 )
 import System.FilePath ((</>), (<.>))
-import Data.Aeson (Result(Success, Error), fromJSON, FromJSON)
+import Data.Aeson ((.:), withObject, Result(Success, Error), fromJSON, FromJSON, parseJSON)
 
 import Network.Wreq (asValue, getWith, defaults, param, header, responseBody)
 import Control.Lens ((^.), (.~), (&))
@@ -108,9 +108,38 @@ data Annotation = Annotation { id :: Text
                              , text :: Text
                              , tags :: [Text]
                              , group :: Text
+                             , target :: [Target]
                              } deriving (Show, Generic)
 
 instance FromJSON Annotation where
+
+data Target = Target { source :: Text
+                     , selector :: [Selector]
+                     } deriving (Show, Generic)
+
+instance FromJSON Target where
+
+data SelectorType = RangeSelector | TextPositionSelector | TextQuoteSelector
+                    deriving (Show, Generic)
+instance FromJSON SelectorType where
+
+data Selector = Selector { _type :: SelectorType
+                         , exact :: Text
+                         , prefix :: Text
+                         , suffix :: Text }
+               | NAS
+                         deriving (Show, Generic)
+
+instance FromJSON Selector where
+  parseJSON = withObject "selector" $ \o -> do
+    t <- o .: "type"
+    case t of
+      RangeSelector        -> return NAS
+      TextPositionSelector -> return NAS
+      TextQuoteSelector    -> Selector <$> o .: "type"
+                                         <*> o .: "exact"
+                                         <*> o .: "prefix"
+                                         <*> o .: "suffix"
 
 fromResult :: Result a -> a
 fromResult (Success r) = r
