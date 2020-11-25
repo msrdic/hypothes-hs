@@ -3,18 +3,19 @@
 module HypothesisClient ( search
                         , SearchFilter (..)
                         , OrderType (..)
-                        , SortType (..) ) where
+                        , SortType (..)
+                        , fetch ) where
 
 import qualified Data.Configurator as DC
 import GHC.Generics ( Generic )
 import qualified Data.Vector as DV
 
-import Data.Text ( Text, concat, pack )
+import Data.Text ( Text, concat, pack, unpack )
 import Data.Text.Encoding ( encodeUtf8 )
 import System.FilePath ((</>), (<.>))
 import Data.Aeson (Result(Success, Error), fromJSON, FromJSON)
 
-import Network.Wreq (getWith, defaults, param, header, responseBody)
+import Network.Wreq (asValue, getWith, defaults, param, header, responseBody)
 import Control.Lens ((^.), (.~), (&))
 import Network.Wreq.Lens (Options)
 import Data.Aeson.Lens (key, _Array)
@@ -78,6 +79,7 @@ toOrder :: OrderType -> Text
 toOrder Asc = "asc"
 toOrder Desc = "desc"
 
+search :: [SearchFilter] -> IO [Annotation]
 search filters = do
   token <- _getAuthToken ("conf" </> "auth" <.> "config")
   authHeader <- getAuthHeader token
@@ -86,13 +88,19 @@ search filters = do
   r <- getWith opts "https://api.hypothes.is/api/search"
   let rb = r ^. responseBody ^. key "rows" . _Array
   let items = map fromResult $ DV.toList $ DV.map fromJSON rb
-  return (items :: [SearchItem])
+  return items
 
-fromResult :: Result a -> a
-fromResult (Success r) = r
-fromResult (Error e) = error e
+fetch :: Text -> IO Annotation
+fetch aid = do
+  token <- _getAuthToken ("conf" </> "auth" <.> "config")
+  authHeader <- getAuthHeader token
+  let opts = defaults & header "Authorization" .~ [encodeUtf8 authHeader]
+  r <- getWith opts ("https://api.hypothes.is/api/annotations/" ++ unpack aid) >>= asValue
+  let rb = r ^. responseBody
+  let annotation = fromResult $ fromJSON rb
+  return (annotation :: Annotation)
 
-data SearchItem = SearchItem { id :: Text
+data Annotation = Annotation { id :: Text
                              , created :: Text
                              , updated :: Text
                              , user :: Text
@@ -102,4 +110,8 @@ data SearchItem = SearchItem { id :: Text
                              , group :: Text
                              } deriving (Show, Generic)
 
-instance FromJSON SearchItem where
+instance FromJSON Annotation where
+
+fromResult :: Result a -> a
+fromResult (Success r) = r
+fromResult (Error e) = error e

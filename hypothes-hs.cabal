@@ -38,6 +38,7 @@ library
 test-suite integration-suite
   hs-source-dirs:   test
   type:             exitcode-stdio-1.0
+  default-language: Haskell2010
   ghc-options:
             -Wall
             -Werror
