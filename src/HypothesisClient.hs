@@ -33,6 +33,7 @@ getAuthHeader t =
 data SearchFilter = User Text
                   | Group Text
                   | URI Text
+                  | URIParts Text
                   | Order OrderType
                   | SearchAfter Text
                   | Sort SortType
@@ -59,6 +60,7 @@ toParam :: SearchFilter -> Options -> Options
 toParam (User u) = param "user" .~ [Data.Text.concat ["acct:", toFullUsername u]]
 toParam (Group gid) = param "group" .~ [gid]
 toParam (URI u) = param "uri" .~ [u]
+toParam (URIParts t) = param "uri.parts" .~ [t]
 toParam (Order o) = param "order" .~ [toOrder o]
 toParam (SearchAfter a) = param "search_after" .~ [a]
 toParam (Sort s) = param "sort" .~ [toSort s]
