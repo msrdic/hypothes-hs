@@ -35,21 +35,6 @@ library
             -Wcompat
             -Wmissing-export-lists
 
-test-suite integration-suite
-  hs-source-dirs:   test
-  type:             exitcode-stdio-1.0
-  default-language: Haskell2010
-  ghc-options:
-            -Wall
-            -Werror
-            -Wcompat
-            -Wmissing-export-lists
-  main-is:          Main.hs
-  build-depends:    base >= 4 && < 5
-                  , hspec
-                  , QuickCheck
-
-
 source-repository head
   type:     git
   location: https://github.com/msrdic/hypothes-hs
