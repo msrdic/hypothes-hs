@@ -14,7 +14,7 @@ import qualified Data.Vector as DV
 import Data.Text ( Text, concat, pack, unpack )
 import Data.Text.Encoding ( encodeUtf8 )
 import System.FilePath ((</>), (<.>))
-import Data.Aeson ((.:), withObject, Result(Success, Error), fromJSON, FromJSON, parseJSON)
+import Data.Aeson (ToJSON, (.:), withObject, Result(Success, Error), fromJSON, FromJSON, parseJSON)
 
 import Network.Wreq (asValue, getWith, defaults, param, header, responseBody)
 import Control.Lens ((^.), (.~), (&))
@@ -115,11 +115,13 @@ data Annotation = Annotation { id :: Text
                              } deriving (Show, Generic)
 
 instance FromJSON Annotation where
+instance ToJSON Annotation where
 
 -- newtype because only one field?
 newtype Document = Document { title :: Maybe [Text] } deriving (Show, Generic)
 
 instance FromJSON Document where
+instance ToJSON Document where
 
 data Links = Links { html :: Maybe Text
                    , incontext :: Maybe Text
@@ -127,16 +129,20 @@ data Links = Links { html :: Maybe Text
                    } deriving (Show, Generic)
 
 instance FromJSON Links where
+instance ToJSON Links where
 
 data Target = Target { source :: Maybe Text
                      , selector :: Maybe [Selector]
                      } deriving (Show, Generic)
 
 instance FromJSON Target where
+instance ToJSON Target where
 
 data SelectorType = RangeSelector | TextPositionSelector | TextQuoteSelector
                     deriving (Show, Generic)
+
 instance FromJSON SelectorType where
+instance ToJSON SelectorType where
 
 data Selector = Selector { _type :: SelectorType
                          , exact :: Text
@@ -152,9 +158,10 @@ instance FromJSON Selector where
       RangeSelector        -> return NAS
       TextPositionSelector -> return NAS
       TextQuoteSelector    -> Selector <$> o .: "type"
-                                         <*> o .: "exact"
-                                         <*> o .: "prefix"
-                                         <*> o .: "suffix"
+                                       <*> o .: "exact"
+                                       <*> o .: "prefix"
+                                       <*> o .: "suffix"
+instance ToJSON Selector where
 
 fromResult :: Result a -> a
 fromResult (Success r) = r
