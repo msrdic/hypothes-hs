@@ -115,7 +115,8 @@ data Annotation = Annotation { id :: Text
 
 instance FromJSON Annotation where
 
-data Document = Document { title :: Maybe [Text] } deriving (Show, Generic)
+-- newtype because only one field?
+newtype Document = Document { title :: Maybe [Text] } deriving (Show, Generic)
 
 instance FromJSON Document where
 
