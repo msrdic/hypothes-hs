@@ -113,8 +113,8 @@ data Annotation = Annotation { id :: Text
 
 instance FromJSON Annotation where
 
-data Target = Target { source :: Text
-                     , selector :: [Selector]
+data Target = Target { source :: Maybe Text
+                     , selector :: Maybe [Selector]
                      } deriving (Show, Generic)
 
 instance FromJSON Target where
