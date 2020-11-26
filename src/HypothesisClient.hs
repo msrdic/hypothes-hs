@@ -109,9 +109,22 @@ data Annotation = Annotation { id :: Text
                              , tags :: [Text]
                              , group :: Text
                              , target :: [Target]
+                             , document :: Maybe Document
+                             , links :: Links
                              } deriving (Show, Generic)
 
 instance FromJSON Annotation where
+
+data Document = Document { title :: Maybe [Text] } deriving (Show, Generic)
+
+instance FromJSON Document where
+
+data Links = Links { html :: Maybe Text
+                   , incontext :: Maybe Text
+                   , json :: Maybe Text
+                   } deriving (Show, Generic)
+
+instance FromJSON Links where
 
 data Target = Target { source :: Maybe Text
                      , selector :: Maybe [Selector]
