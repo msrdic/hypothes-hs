@@ -24,7 +24,7 @@ import Data.Aeson.Lens (key, _Array)
 _getAuthToken :: FilePath -> IO (Maybe Text)
 _getAuthToken path = do
   config <- DC.load [DC.Required path]
-  DC.lookup config "token" :: IO (Maybe Text)
+  DC.lookup config "token"
 
 getAuthHeader :: Maybe Text -> IO Text
 getAuthHeader t =
