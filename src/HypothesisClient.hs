@@ -1,9 +1,10 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
-module HypothesisClient ( search
+module HypothesisClient ( Annotation (..)
                         , SearchFilter (..)
                         , OrderType (..)
                         , SortType (..)
+                        , search
                         , fetch ) where
 
 import qualified Data.Configurator as DC
