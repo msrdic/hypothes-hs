@@ -8,7 +8,7 @@ license-file:        LICENSE
 author:              Mladen Srdic
 maintainer:          m.s.qubits@gmail.com
 copyright:           2020 Mladen Srdic
-category:            Web
+category:            Web, Client
 build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
