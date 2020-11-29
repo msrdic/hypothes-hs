@@ -80,12 +80,17 @@ toOrder :: OrderType -> Text
 toOrder Asc = "asc"
 toOrder Desc = "desc"
 
-search :: [SearchFilter] -> IO [Annotation]
-search filters = do
+_getOpts :: [SearchFilter] -> IO Options
+_getOpts filters = do
   token <- _getAuthToken ("conf" </> "auth" <.> "config")
   authHeader <- getAuthHeader token
   let params = getParams filters
   let opts = params & header "Authorization" .~ [encodeUtf8 authHeader]
+  return opts
+
+search :: [SearchFilter] -> IO [Annotation]
+search filters = do
+  opts <- _getOpts filters
   r <- getWith opts "https://api.hypothes.is/api/search"
   let rb = r ^. responseBody ^. key "rows" . _Array
   let items = map fromResult $ DV.toList $ DV.map fromJSON rb
@@ -93,9 +98,7 @@ search filters = do
 
 fetch :: Text -> IO Annotation
 fetch aid = do
-  token <- _getAuthToken ("conf" </> "auth" <.> "config")
-  authHeader <- getAuthHeader token
-  let opts = defaults & header "Authorization" .~ [encodeUtf8 authHeader]
+  opts <- _getOpts []
   r <- getWith opts ("https://api.hypothes.is/api/annotations/" ++ unpack aid) >>= asValue
   let rb = r ^. responseBody
   let annotation = fromResult $ fromJSON rb
