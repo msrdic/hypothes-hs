@@ -24,8 +24,8 @@ _getAuthToken path = do
   config <- DC.load [DC.Required path]
   DC.lookup config "token"
 
-getAuthHeader :: Maybe Text -> IO Text
-getAuthHeader t =
+_getAuthHeader :: Maybe Text -> IO Text
+_getAuthHeader t =
   return $ case t of
     Nothing -> error "Token not set in auth.config."
     Just token -> Data.Text.concat ["Bearer ", token]
@@ -81,7 +81,7 @@ toOrder Desc = "desc"
 _getOpts :: [SearchFilter] -> IO Options
 _getOpts filters = do
   token <- _getAuthToken ("conf" </> "auth" <.> "config")
-  authHeader <- getAuthHeader token
+  authHeader <- _getAuthHeader token
   let params = getParams filters
   let opts = params & header "Authorization" .~ [encodeUtf8 authHeader]
   return opts
