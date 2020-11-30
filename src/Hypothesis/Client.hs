@@ -1,18 +1,22 @@
 {-# LANGUAGE OverloadedStrings #-}
-{-# LANGUAGE DeriveGeneric #-}
-module HypothesisClient ( Annotation (..), Document (..), Links (..)
+module Hypothesis.Client ( SearchFilter (..), OrderType (..), SortType (..)
+                        , search, fetch 
+                        -- re-export
+                        , Annotation (..), Document (..), Links (..)
+                        , Target (..), Selector (..), SelectorType (..) ) where
+
+import Hypothesis.Base ( Annotation (..), Document (..), Links (..)
                         , Target (..), Selector (..), SelectorType (..)
-                        , SearchFilter (..), OrderType (..), SortType (..)
-                        , search, fetch ) where
+                        , fromResult )
+
+import Data.Aeson ( fromJSON )
 
 import qualified Data.Configurator as DC
-import GHC.Generics ( Generic )
 import qualified Data.Vector as DV
 
 import Data.Text ( Text, concat, pack, unpack )
 import Data.Text.Encoding ( encodeUtf8 )
 import System.FilePath ((</>), (<.>))
-import Data.Aeson (ToJSON, (.:), withObject, Result(Success, Error), fromJSON, FromJSON, parseJSON)
 
 import Network.Wreq (asValue, getWith, defaults, param, header, responseBody)
 import Control.Lens ((^.), (.~), (&))
@@ -100,70 +104,4 @@ fetch aid = do
   r <- getWith opts ("https://api.hypothes.is/api/annotations/" ++ unpack aid) >>= asValue
   let rb = r ^. responseBody
   let annotation = fromResult $ fromJSON rb
-  return (annotation :: Annotation)
-
-data Annotation = Annotation { id :: Text
-                             , created :: Text
-                             , updated :: Text
-                             , user :: Text
-                             , uri :: Text
-                             , text :: Text
-                             , tags :: [Text]
-                             , group :: Text
-                             , target :: [Target]
-                             , document :: Maybe Document
-                             , links :: Links
-                             } deriving (Show, Generic)
-
-instance FromJSON Annotation where
-instance ToJSON Annotation where
-
--- newtype because only one field?
-newtype Document = Document { title :: Maybe [Text] } deriving (Show, Generic)
-
-instance FromJSON Document where
-instance ToJSON Document where
-
-data Links = Links { html :: Maybe Text
-                   , incontext :: Maybe Text
-                   , json :: Maybe Text
-                   } deriving (Show, Generic)
-
-instance FromJSON Links where
-instance ToJSON Links where
-
-data Target = Target { source :: Maybe Text
-                     , selector :: Maybe [Selector]
-                     } deriving (Show, Generic)
-
-instance FromJSON Target where
-instance ToJSON Target where
-
-data SelectorType = RangeSelector | TextPositionSelector | TextQuoteSelector
-                    deriving (Show, Generic)
-
-instance FromJSON SelectorType where
-instance ToJSON SelectorType where
-
-data Selector = Selector { _type :: SelectorType
-                         , exact :: Text
-                         , prefix :: Text
-                         , suffix :: Text }
-               | NAS
-                         deriving (Show, Generic)
-
-instance FromJSON Selector where
-  parseJSON = withObject "selector" $ \o -> do
-    t <- o .: "type"
-    case t of
-      RangeSelector        -> return NAS
-      TextPositionSelector -> return NAS
-      TextQuoteSelector    -> Selector <$> o .: "type"
-                                       <*> o .: "exact"
-                                       <*> o .: "prefix"
-                                       <*> o .: "suffix"
-instance ToJSON Selector where
-
-fromResult :: Result a -> a
-fromResult (Success r) = r
-fromResult (Error e) = error e
+  return annotation

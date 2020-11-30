@@ -13,9 +13,26 @@ build-type:          Simple
 extra-source-files:  README.md
 cabal-version:       >=1.10
 
+library hypothesis-mustache
+  hs-source-dirs:      src
+  exposed-modules:     Hypothesis.Mustache
+  other-modules:       Hypothesis.Base
+  build-depends:       base >= 4.7 && < 5
+                     , mustache
+                     , hypothes-hs
+                     , text
+                     , aeson
+  default-language:    Haskell2010
+  ghc-options:
+            -Wall
+            -Werror
+            -Wcompat
+            -Wmissing-export-lists
+
 library
   hs-source-dirs:      src
-  exposed-modules:     HypothesisClient
+  exposed-modules:     Hypothesis.Base
+                       Hypothesis.Client
   build-depends:       base >= 4.7 && < 5
                      , configurator
                      , text
