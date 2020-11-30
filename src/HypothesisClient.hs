@@ -1,11 +1,9 @@
 {-# LANGUAGE OverloadedStrings #-}
 {-# LANGUAGE DeriveGeneric #-}
-module HypothesisClient ( Annotation (..)
-                        , SearchFilter (..)
-                        , OrderType (..)
-                        , SortType (..)
-                        , search
-                        , fetch ) where
+module HypothesisClient ( Annotation (..), Document (..), Links (..)
+                        , Target (..), Selector (..), SelectorType (..)
+                        , SearchFilter (..), OrderType (..), SortType (..)
+                        , search, fetch ) where
 
 import qualified Data.Configurator as DC
 import GHC.Generics ( Generic )
