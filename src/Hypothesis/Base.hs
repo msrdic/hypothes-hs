@@ -6,8 +6,7 @@ module Hypothesis.Base ( Annotation (..), Document (..), Links (..)
 
 import GHC.Generics ( Generic )
 import Data.Text ( Text )
-import Data.Aeson ( ToJSON, FromJSON, parseJSON, (.:), withObject
-                  , Result ( Success, Error ) )
+import Data.Aeson ( Result ( Success, Error ) )
 
 data Annotation = Annotation { id :: Text
                              , created :: Text
@@ -47,30 +46,3 @@ data Selector = Selector { _type :: SelectorType
 fromResult :: Result a -> a
 fromResult (Success r) = r
 fromResult (Error e) = error e
-
-instance FromJSON Annotation where
-instance ToJSON Annotation where
-
-instance FromJSON Document where
-instance ToJSON Document where
-
-instance FromJSON Links where
-instance ToJSON Links where
-
-instance FromJSON Target where
-instance ToJSON Target where
-
-instance FromJSON SelectorType where
-instance ToJSON SelectorType where
-
-instance FromJSON Selector where
-  parseJSON = withObject "selector" $ \o -> do
-    t <- o .: "type"
-    case t of
-      RangeSelector        -> return NAS
-      TextPositionSelector -> return NAS
-      TextQuoteSelector    -> Selector <$> o .: "type"
-                                       <*> o .: "exact"
-                                       <*> o .: "prefix"
-                                       <*> o .: "suffix"
-instance ToJSON Selector where

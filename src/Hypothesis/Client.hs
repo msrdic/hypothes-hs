@@ -1,13 +1,15 @@
 {-# LANGUAGE OverloadedStrings #-}
 module Hypothesis.Client ( SearchFilter (..), OrderType (..), SortType (..)
                         , search, fetch 
-                        -- re-export
+                        -- re-export Base
                         , Annotation (..), Document (..), Links (..)
                         , Target (..), Selector (..), SelectorType (..) ) where
 
 import Hypothesis.Base ( Annotation (..), Document (..), Links (..)
                         , Target (..), Selector (..), SelectorType (..)
                         , fromResult )
+
+import Hypothesis.Aeson ()
 
 import Data.Aeson ( fromJSON )
 
