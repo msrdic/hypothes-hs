@@ -18,28 +18,28 @@ data Annotation = Annotation { id :: !Text
                              , target :: ![Target]
                              , document :: !(Maybe Document)
                              , links :: !Links
-                             } deriving (Show, Generic)
+                             } deriving (Show, Generic, Eq)
 
-newtype Document = Document { title :: Maybe [Text] } deriving (Show, Generic)
+newtype Document = Document { title :: Maybe [Text] } deriving (Show, Generic, Eq)
 
 data Links = Links { html :: !(Maybe Text)
                    , incontext :: !(Maybe Text)
                    , json :: !(Maybe Text)
-                   } deriving (Show, Generic)
+                   } deriving (Show, Generic, Eq)
 
 data Target = Target { source :: !(Maybe Text)
                      , selector :: !(Maybe [Selector])
-                     } deriving (Show, Generic)
+                     } deriving (Show, Generic, Eq)
 
 data SelectorType = RangeSelector | TextPositionSelector | TextQuoteSelector
-                    deriving (Show, Generic)
+                    deriving (Show, Generic, Eq)
 
 data Selector = Selector { _type :: !SelectorType
                          , exact :: !Text
                          , prefix :: !Text
                          , suffix :: !Text }
                | NAS
-                         deriving (Show, Generic)
+                         deriving (Show, Generic, Eq)
 
 -- this should go to an internal library
 fromResult :: Result a -> a
