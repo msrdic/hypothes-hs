@@ -36,15 +36,15 @@ _getAuthHeader t =
     Nothing -> error "Token not set in auth.config."
     Just token -> Data.Text.concat ["Bearer ", token]
 
-data SearchFilter = User Text
-                  | Group Text
-                  | URI Text
-                  | URIParts Text
-                  | Order OrderType
-                  | SearchAfter Text
-                  | Sort SortType
-                  | Limit Int
-                  | Any Text
+data SearchFilter = User !Text
+                  | Group !Text
+                  | URI !Text
+                  | URIParts !Text
+                  | Order !OrderType
+                  | SearchAfter !Text
+                  | Sort !SortType
+                  | Limit !Int
+                  | Any !Text
 
 data OrderType = Asc | Desc
 data SortType = SortByCreated
