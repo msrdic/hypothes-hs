@@ -31,15 +31,25 @@ data Target = Target { source :: !(Maybe Text)
                      , selector :: !(Maybe [Selector])
                      } deriving (Show, Generic, Eq)
 
-data SelectorType = RangeSelector | TextPositionSelector | TextQuoteSelector
-                    deriving (Show, Generic, Eq)
+data SelectorType = RangeSelectorType
+                  | TextPositionSelectorType
+                  | TextQuoteSelectorType deriving (Show, Generic, Eq)
 
-data Selector = Selector { _type :: !SelectorType
-                         , exact :: !Text
-                         , prefix :: !Text
-                         , suffix :: !Text }
-               | NAS
-                         deriving (Show, Generic, Eq)
+data Selector = TextQuoteSelector { _type :: !SelectorType
+                                  , exact :: !Text
+                                  , prefix :: !Text
+                                  , suffix :: !Text
+                                  }
+              | TextPositionSelector { _type :: !SelectorType
+                                     , start :: !Int
+                                     , end :: !Int
+                                     }
+              | RangeSelector { _type :: !SelectorType
+                              , startOffset :: !Int
+                              , endOffset :: !Int
+                              , startContainer :: !Text
+                              , endContainer :: !Text
+                              } deriving (Show, Generic, Eq)
 
 -- this should go to an internal library
 fromResult :: Result a -> a

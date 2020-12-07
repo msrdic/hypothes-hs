@@ -24,10 +24,16 @@ instance FromJSON Selector where
   parseJSON = withObject "selector" $ \o -> do
     t <- o .: "type"
     case t of
-      RangeSelector        -> return NAS
-      TextPositionSelector -> return NAS
-      TextQuoteSelector    -> Selector <$> o .: "type"
-                                       <*> o .: "exact"
-                                       <*> o .: "prefix"
-                                       <*> o .: "suffix"
+      RangeSelectorType        -> RangeSelector <$> o .: "type"
+                                                <*> o .: "startOffset"
+                                                <*> o .: "endOffset"
+                                                <*> o .: "startContainer"
+                                                <*> o .: "endContainer"
+      TextPositionSelectorType -> TextPositionSelector <$> o .: "type"
+                                                       <*> o .: "start"
+                                                       <*> o .: "end"
+      TextQuoteSelectorType    -> TextQuoteSelector <$> o .: "type"
+                                                    <*> o .: "exact"
+                                                    <*> o .: "prefix"
+                                                    <*> o .: "suffix"
 instance ToJSON Selector where
