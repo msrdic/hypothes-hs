@@ -18,6 +18,10 @@ instance FromJSON Target where
 instance ToJSON Target where
 
 instance FromJSON SelectorType where
+  parseJSON "RangeSelector" = return RangeSelectorType
+  parseJSON "TextPositionSelector" = return TextPositionSelectorType
+  parseJSON "TextQuoteSelector" = return TextQuoteSelectorType
+  parseJSON _ = error "Unknown selector type"
 instance ToJSON SelectorType where
 
 instance FromJSON Selector where
