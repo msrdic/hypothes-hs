@@ -3,7 +3,14 @@
 module Hypothesis.Aeson () where
 
 import Hypothesis.Base
-import Data.Aeson ( ToJSON, FromJSON, parseJSON, (.:), withObject)
+    ( Selector(TextQuoteSelector, RangeSelector, TextPositionSelector),
+      SelectorType(..),
+      Target,
+      Links,
+      Document,
+      Annotation )
+import Data.Aeson ( ToJSON, FromJSON, toJSON, parseJSON, (.:), withObject)
+import Data.Aeson.Types (Value(String))
 
 instance FromJSON Annotation where
 instance ToJSON Annotation where
@@ -23,6 +30,9 @@ instance FromJSON SelectorType where
   parseJSON "TextQuoteSelector" = return TextQuoteSelectorType
   parseJSON _ = error "Unknown selector type"
 instance ToJSON SelectorType where
+  toJSON RangeSelectorType = String "RangeSelector"
+  toJSON TextPositionSelectorType = String "TextPositionSelector"
+  toJSON TextQuoteSelectorType = String "TextQuoteSelector"
 
 instance FromJSON Selector where
   parseJSON = withObject "selector" $ \o -> do
