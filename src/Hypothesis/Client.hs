@@ -6,12 +6,10 @@ module Hypothesis.Client ( SearchFilter (..), OrderType (..), SortType (..)
                         , Target (..), Selector (..), SelectorType (..) ) where
 
 import Hypothesis.Base ( Annotation (..), Document (..), Links (..)
-                        , Target (..), Selector (..), SelectorType (..)
-                        , fromResult )
-
+                        , Target (..), Selector (..), SelectorType (..))
 import Hypothesis.Aeson ()
 
-import Data.Aeson ( fromJSON )
+import Data.Aeson (Result (..),  fromJSON )
 
 import qualified Data.Configurator as DC
 import qualified Data.Vector as DV
@@ -97,7 +95,7 @@ search filters = do
   opts <- _getOpts filters
   r <- getWith opts "https://api.hypothes.is/api/search"
   let rb = r ^. responseBody ^. key "rows" . _Array
-  let items = map fromResult $ DV.toList $ DV.map fromJSON rb
+  let items = map _fromResult $ DV.toList $ DV.map fromJSON rb
   return items
 
 fetch :: Text -> IO Annotation
@@ -105,5 +103,9 @@ fetch aid = do
   opts <- _getOpts []
   r <- getWith opts ("https://api.hypothes.is/api/annotations/" ++ unpack aid) >>= asValue
   let rb = r ^. responseBody
-  let annotation = fromResult $ fromJSON rb
+  let annotation = _fromResult $ fromJSON rb
   return annotation
+
+_fromResult :: Result a -> a
+_fromResult (Success r) = r
+_fromResult (Error e) = error e

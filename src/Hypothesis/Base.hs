@@ -1,11 +1,9 @@
 {-# LANGUAGE DeriveGeneric #-}
 module Hypothesis.Base ( Annotation (..), Document (..), Links (..)
-                      , Target (..), Selector (..), SelectorType (..)
-                      , fromResult ) where
+                      , Target (..), Selector (..), SelectorType (..)) where
 
 import GHC.Generics ( Generic )
 import Data.Text ( Text )
-import Data.Aeson ( Result ( Success, Error ) )
 
 data Annotation = Annotation { id :: !Text
                              , created :: !Text
@@ -50,8 +48,3 @@ data Selector = TextQuoteSelector { _type :: !SelectorType
                               , startContainer :: !Text
                               , endContainer :: !Text
                               } deriving (Show, Generic, Eq)
-
--- this should go to an internal library
-fromResult :: Result a -> a
-fromResult (Success r) = r
-fromResult (Error e) = error e

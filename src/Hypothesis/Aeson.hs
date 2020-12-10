@@ -25,14 +25,14 @@ instance FromJSON Target where
 instance ToJSON Target where
 
 instance FromJSON SelectorType where
-  parseJSON "RangeSelector" = return RangeSelectorType
+  parseJSON "RangeSelector"        = return RangeSelectorType
   parseJSON "TextPositionSelector" = return TextPositionSelectorType
-  parseJSON "TextQuoteSelector" = return TextQuoteSelectorType
-  parseJSON _ = error "Unknown selector type"
+  parseJSON "TextQuoteSelector"    = return TextQuoteSelectorType
+  parseJSON _                      = error "Unknown selector type"
 instance ToJSON SelectorType where
-  toJSON RangeSelectorType = String "RangeSelector"
+  toJSON RangeSelectorType        = String "RangeSelector"
   toJSON TextPositionSelectorType = String "TextPositionSelector"
-  toJSON TextQuoteSelectorType = String "TextQuoteSelector"
+  toJSON TextQuoteSelectorType    = String "TextQuoteSelector"
 
 instance FromJSON Selector where
   parseJSON = withObject "selector" $ \o -> do
